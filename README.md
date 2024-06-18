@@ -2,6 +2,8 @@
 
 A graph visualiser designed to be self-hosted.
 
+![GIF of graph moving in a spring-like motion](./images/cule.gif)
+
 ## How to build site
 
 ### Install
