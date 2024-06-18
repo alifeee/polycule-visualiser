@@ -1,0 +1,12 @@
+{
+  "nodes": ["Ash", "Bri", "Ciar", "Darl", "Elfo", "France", "George"],
+  "edges": [
+    ["Ash", "Bri"],
+    ["Ash", "Ciar"],
+    ["Bri", "Darl"],
+    ["Ciar", "Elfo"],
+    ["Elfo", "George"],
+    ["Elfo", "France"],
+    ["Bri", "Elfo"]
+  ]
+}

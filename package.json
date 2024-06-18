@@ -1,0 +1,23 @@
+{
+  "name": "polycule-visualiser",
+  "version": "0.1.0",
+  "description": "Editable polycule website",
+  "scripts": {
+    "build": "eleventy",
+    "dev": "eleventy --serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alifeee/polycule-visualiser"
+  },
+  "keywords": [
+    "graph",
+    "visualisation",
+    "polyamory"
+  ],
+  "author": "alifeee",
+  "license": "ISC",
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1"
+  }
+}

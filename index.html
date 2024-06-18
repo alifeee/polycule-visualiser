@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Polycule Visualiser</title>
+    <script src="jquery.min.js"></script>
+    <script src="springy.js"></script>
+    <script src="springyui.js"></script>
+    <script>
+      fetch("polycule.json")
+        .then((data) => data.json())
+        .then((json) => {
+          let graph = new Springy.Graph();
+          graph.loadJSON(json);
+          //   var springy = jQuery("#springydemo").springy({
+          //     graph: graph,
+          //   });
+          let layout = new Springy.Layout.ForceDirected(
+            graph,
+            400.0,
+            400.0,
+            0.5
+          );
+
+          let svg = document.getElementById("svg");
+          let rects = svg.getElementById("rects");
+          let edges = svg.getElementById("edges");
+          let nodes = svg.getElementById("nodes");
+          let svg_bbox = {
+            bottomleft: { x: 10, y: 90 },
+            topright: { x: 90, y: 10 },
+          };
+
+          function transform_coordinates(fromcorners, tocorners, point) {
+            b1x = fromcorners.bottomleft.x;
+            b1y = fromcorners.bottomleft.y;
+            b2x = fromcorners.topright.x;
+            b2y = fromcorners.topright.y;
+
+            s1x = tocorners.bottomleft.x;
+            s1y = tocorners.bottomleft.y;
+            s2x = tocorners.topright.x;
+            s2y = tocorners.topright.y;
+
+            let transfomed = {
+              x: s1x + ((s2x - s1x) / (b2x - b1x)) * (point.x - b1x),
+              y: s1y + ((s2y - s1y) / (b2y - b1y)) * (point.y - b1y),
+            };
+            return transfomed;
+          }
+
+          var renderer = new Springy.Renderer(
+            layout,
+            function clear() {
+              for (group of [nodes, edges, rects]) {
+                while (group.lastChild) {
+                  group.removeChild(group.lastChild);
+                }
+              }
+            },
+            function drawEdge(edge, p1, p2) {
+              //   draw edge
+              let boundingbox = layout.getBoundingBox();
+              a1 = transform_coordinates(boundingbox, svg_bbox, p1);
+              a2 = transform_coordinates(boundingbox, svg_bbox, p2);
+              let NS = "http://www.w3.org/2000/svg";
+              let path = document.createElementNS(NS, "path");
+              path.setAttributeNS(
+                null,
+                "d",
+                `M ${a1.x} ${a1.y} L ${a2.x} ${a2.y}`
+              );
+              path.setAttributeNS(null, "stroke", "#E88851");
+              edges.appendChild(path);
+            },
+            function drawNode(node, p) {
+              let boundingbox = layout.getBoundingBox();
+              a = transform_coordinates(boundingbox, svg_bbox, p);
+              let NS = "http://www.w3.org/2000/svg";
+
+              let text = document.createElementNS(NS, "text");
+              text.setAttributeNS(null, "x", a.x);
+              text.setAttributeNS(null, "y", a.y);
+              text.setAttributeNS(null, "font-size", 5);
+              text.setAttributeNS(null, "text-anchor", "middle");
+              text.setAttributeNS(null, "alignment-baseline", "central");
+              text.setAttributeNS(null, "dominant-baseline", "central");
+              text.setAttributeNS(null, "fill", "#96DCDD");
+              let textNode = document.createTextNode(node.id);
+              text.appendChild(textNode);
+              nodes.appendChild(text);
+
+              let bbox = text.getBBox();
+              let width = bbox.width * 1.1;
+              let height = bbox.height * 1.2;
+              let rect = document.createElementNS(NS, "rect");
+              rect.setAttributeNS(null, "x", a.x - width / 2);
+              rect.setAttributeNS(null, "y", a.y - height / 2);
+              rect.setAttributeNS(null, "width", width);
+              rect.setAttributeNS(null, "height", height);
+              rect.setAttributeNS(null, "fill", "#A899E8");
+              rect.setAttributeNS(null, "rx", 1);
+
+              rects.appendChild(rect);
+            }
+          );
+          renderer.start();
+        });
+    </script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background-color: #ede1eb;
+      }
+      #svg {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <svg
+      id="svg"
+      width="500"
+      height="500"
+      viewBox="-20 -20 120 120"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="edges"></g>
+      <g id="rects"></g>
+      <g id="nodes"></g>
+    </svg>
+  </body>
+</html>
