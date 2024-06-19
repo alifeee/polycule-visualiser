@@ -42,7 +42,12 @@ if [ ! -z "${param[addnode]}" ]; then
 fi
 if [ ! -z "${param[removenode]}" ]; then
   echo "remove node!: ${param[removenode]}" >> $log
-  json=$(echo "${json}" | jq '.nodes |= .- ["'"${param[removenode]}"'"]')
+  appearsinedges=$(echo "${json}" | jq -r '.edges | .[] | .[]' | grep "${param[removenode]}" | wc -l)
+  if [ $appearsinedges == 0 ]; then
+    json=$(echo "${json}" | jq '.nodes |= .- ["'"${param[removenode]}"'"]')
+  else
+    echo "refusing to remove node with edges" >> $log
+  fi
 fi
 if [ ! -z "${param[addedge1]}" ] && [ ! -z "${param[addedge2]}" ]; then
   echo "add edge from ${param[addedge1]} to ${param[addedge2]}" >> $log
