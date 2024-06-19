@@ -127,6 +127,19 @@
         max-width: 100%;
         max-height: 100%;
       }
+      section.edit {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      section.edit > button {
+        width: max-content;
+        margin: auto;
+      }
+      #form {
+        display: none;
+        margin: auto;
+      }
     </style>
   </head>
   <body>
@@ -141,32 +154,40 @@
       <g id="rects"></g>
       <g id="nodes"></g>
     </svg>
-    <form action="https://server.alifeee.co.uk/polycule/edit.cgi" method="post">
-      <label for="addnode">Add new node</label>
-      <input type="text" id="addnode" name="addnode" />
+    <section class="edit">
+      <button onclick='$("#form").toggle()'>edit...</button>
+      <form
+        action="https://server.alifeee.co.uk/polycule/edit.cgi"
+        method="post"
+        id="form"
+        autocomplete="off"
+      >
+        <label for="addnode">Add new node</label>
+        <input type="text" id="addnode" name="addnode" />
 
-      <br />
+        <br />
 
-      <label for="removenode">Remove node</label>
-      <input type="text" id="removenode" name="removenode" />
+        <label for="removenode">Remove node</label>
+        <input type="text" id="removenode" name="removenode" />
 
-      <br />
+        <br />
 
-      <label for="addedge1">Connect</label>
-      <input type="text" id="addedge1" name="addedge1" />
-      <label for="addedge2">to</label>
-      <input type="text" id="addedge2" name="addedge2" />
+        <label for="addedge1">Connect</label>
+        <input type="text" id="addedge1" name="addedge1" />
+        <label for="addedge2">to</label>
+        <input type="text" id="addedge2" name="addedge2" />
 
-      <br />
+        <br />
 
-      <label for="dcedge1">Disconnect</label>
-      <input type="text" id="dcedge1" name="dcedge1" />
-      <label for="dcedge2">from</label>
-      <input type="text" id="dcedge2" name="dcedge2" />
+        <label for="dcedge1">Disconnect</label>
+        <input type="text" id="dcedge1" name="dcedge1" />
+        <label for="dcedge2">from</label>
+        <input type="text" id="dcedge2" name="dcedge2" />
 
-      <br />
+        <br />
 
-      <button role="form">Change!</button>
-    </form>
+        <button role="form">Change!</button>
+      </form>
+    </section>
   </body>
 </html>
