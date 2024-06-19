@@ -57,7 +57,9 @@ echo "json after:" >> $log
 echo "${json}" >> $log
 echo "${json}" > $SCRIPT_DIR/polycule.json
 echo "rebuilding site..." >> $log
-(2>&1; cd $SCRIPT_DIR; npm run build >> $log)
+echo "cannot rebuild site... not able to use npm... copying json manually" >> $log
+# (2>&1; cd $SCRIPT_DIR; npm run build >> $log)
+cp $SCRIPT_DIR/polycule.json $SCRIPT_DIR/_site/polycule.json
 
 echo "issuing redirect..." >> $log
 echo "HTTP/1.1 303 See Other"
