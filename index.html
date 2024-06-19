@@ -9,7 +9,49 @@
     <script src="springy.js"></script>
     <script src="springyui.js"></script>
     <script>
-      fetch("polycule.json", {cache: "no-store"})
+      let lastClicked = null;
+      function clearForm(form) {
+        let inputs = document.querySelectorAll("input");
+        for (input of inputs) {
+          input.value = "";
+        }
+      }
+
+      function makePathBig(ev) {
+        ev.target.setAttributeNS(null, "stroke-width", "2");
+      }
+      function makePathSmall(ev) {
+        ev.target.setAttributeNS(null, "stroke-width", "1");
+      }
+      function pathCallBack(node1, node2) {
+        return function (ev) {
+          let form = document.getElementById("form");
+          clearForm(form);
+          let dc1 = document.getElementById("dcedge1");
+          let dc2 = document.getElementById("dcedge2");
+          dc1.value = node1;
+          dc2.value = node2;
+          lastClicked = null;
+        };
+      }
+      function nodeCallBack(node) {
+        return function (ev) {
+          let form = document.getElementById("form");
+          clearForm(form);
+          if (!lastClicked || lastClicked == node) {
+            let removenode = document.getElementById("removenode");
+            removenode.value = node;
+          } else {
+            let addedge1 = document.getElementById("addedge1");
+            let addedge2 = document.getElementById("addedge2");
+            addedge1.value = lastClicked;
+            addedge2.value = node;
+          }
+          lastClicked = node;
+        };
+      }
+
+      fetch("polycule.json", { cache: "no-store" })
         .then((data) => data.json())
         .then((json) => {
           let graph = new Springy.Graph();
@@ -26,6 +68,7 @@
 
           let svg = document.getElementById("svg");
           let rects = svg.getElementById("rects");
+          let clickrects = svg.getElementById("clickrects");
           let edges = svg.getElementById("edges");
           let nodes = svg.getElementById("nodes");
           let svg_bbox = {
@@ -51,10 +94,10 @@
             return transfomed;
           }
 
-          var renderer = new Springy.Renderer(
+          let renderer = new Springy.Renderer(
             layout,
             function clear() {
-              for (group of [nodes, edges, rects]) {
+              for (group of [nodes, edges, rects, clickrects]) {
                 while (group.lastChild) {
                   group.removeChild(group.lastChild);
                 }
@@ -73,7 +116,14 @@
                 `M ${a1.x} ${a1.y} L ${a2.x} ${a2.y}`
               );
               path.setAttributeNS(null, "stroke", "#E88851");
+              path.setAttributeNS(null, "stroke-width", "1");
               edges.appendChild(path);
+              path.addEventListener("mouseenter", makePathBig);
+              path.addEventListener("mouseleave", makePathSmall);
+              path.addEventListener(
+                "click",
+                pathCallBack(edge.source.id, edge.target.id)
+              );
             },
             function drawNode(node, p) {
               let boundingbox = layout.getBoundingBox();
@@ -104,6 +154,16 @@
               rect.setAttributeNS(null, "rx", 1);
 
               rects.appendChild(rect);
+
+              let clickrect = document.createElementNS(NS, "rect");
+              clickrect.setAttributeNS(null, "x", a.x - width / 2);
+              clickrect.setAttributeNS(null, "y", a.y - height / 2);
+              clickrect.setAttributeNS(null, "width", width);
+              clickrect.setAttributeNS(null, "height", height);
+              clickrect.setAttributeNS(null, "fill", "#0000");
+              clickrect.setAttributeNS(null, "rx", 1);
+              clickrects.appendChild(clickrect);
+              clickrect.addEventListener("click", nodeCallBack(node.id));
             }
           );
           renderer.start();
@@ -126,6 +186,12 @@
         width: 100%;
         max-width: 100%;
         max-height: 100%;
+      }
+      #svg > #edges > path {
+        cursor: pointer;
+      }
+      #svg > #clickrects > rect {
+        cursor: pointer;
       }
       section.edit {
         display: flex;
@@ -153,6 +219,7 @@
       <g id="edges"></g>
       <g id="rects"></g>
       <g id="nodes"></g>
+      <g id="clickrects"></g>
     </svg>
     <section class="edit">
       <button onclick='$("#form").toggle()'>edit...</button>
