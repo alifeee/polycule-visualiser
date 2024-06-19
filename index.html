@@ -9,7 +9,7 @@
     <script src="springy.js"></script>
     <script src="springyui.js"></script>
     <script>
-      fetch("polycule.json")
+      fetch("polycule.json", {cache: "no-store"})
         .then((data) => data.json())
         .then((json) => {
           let graph = new Springy.Graph();
