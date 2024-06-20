@@ -42,6 +42,7 @@ json=$(cat $SCRIPT_DIR/polycule.json)
 echo "current json:" >> $log
 echo "${json}" | jq -c >> $log
 
+# add node
 if [ ! -z "${param[addnode]}" ]; then
   echo "add node!: ${param[addnode]}" >> $log
   innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addnode]}$" | wc -l)
@@ -51,6 +52,7 @@ if [ ! -z "${param[addnode]}" ]; then
     echo "node already in nodes, doing nothing..." >> $log
   fi
 fi
+# remove node
 if [ ! -z "${param[removenode]}" ]; then
   echo "remove node!: ${param[removenode]}" >> $log
   appearsinedges=$(echo "${json}" | jq -r '.edges | .[] | .[]' | grep "${param[removenode]}" | wc -l)
@@ -60,6 +62,7 @@ if [ ! -z "${param[removenode]}" ]; then
     echo "refusing to remove node with edges" >> $log
   fi
 fi
+# add edge
 if [ ! -z "${param[addedge1]}" ] && [ ! -z "${param[addedge2]}" ]; then
   echo "add edge from ${param[addedge1]} to ${param[addedge2]}" >> $log
   edge1innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addedge1]}$" | wc -l)
@@ -75,6 +78,7 @@ if [ ! -z "${param[addedge1]}" ] && [ ! -z "${param[addedge2]}" ]; then
     json=$(echo "${json}" | jq '.edges |= .+ [["'"${param[addedge1]}"'","'"${param[addedge2]}"'"]]')
   fi
 fi
+# remove edge
 if [ ! -z "${param[dcedge1]}" ] && [ ! -z "${param[dcedge2]}" ]; then
   echo "disconnect edge from ${param[dcedge1]} to ${param[dcedge2]}" >> $log
   json=$(echo "${json}" | jq '.edges |= .- [["'"${param[dcedge1]}"'","'"${param[dcedge2]}"'"]]')
