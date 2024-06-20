@@ -6,6 +6,7 @@ _site
 
 # data
 polycule.json
+_data/URIs.json
 
 # log
 log

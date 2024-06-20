@@ -8,9 +8,14 @@ A graph visualiser designed to be self-hosted.
 
 ### Install
 
+Install dependencies & copy site-specific data files.
+
 ```bash
 npm install
 cp polycule.json.example polycule.json
+nano polycule.json
+cp _data/URIs.json.example _data/URIs.json
+nano _data/URIs.json
 ```
 
 ### Build site
