@@ -51,7 +51,15 @@ if [ ! -z "${param[removenode]}" ]; then
 fi
 if [ ! -z "${param[addedge1]}" ] && [ ! -z "${param[addedge2]}" ]; then
   echo "add edge from ${param[addedge1]} to ${param[addedge2]}" >> $log
-  json=$(echo "${json}" | jq '.edges |= .+ [["'"${param[addedge1]}"'","'"${param[addedge2]}"'"]]')
+  edge1innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addedge1]}$" | wc -l)
+  edge2innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addedge2]}$" | wc -l)
+  if [ $edge1innodes != 1 ] || [ $edge2innodes != 1 ]; then
+    echo "desired edge not found in edges" >> $log
+  elif [ "${param[addedge1]}" == "${param[addedge2]}" ]; then
+    echo "desired edges are the same, doing nothing" >> $log
+  else
+    json=$(echo "${json}" | jq '.edges |= .+ [["'"${param[addedge1]}"'","'"${param[addedge2]}"'"]]')
+  fi
 fi
 if [ ! -z "${param[dcedge1]}" ] && [ ! -z "${param[dcedge2]}" ]; then
   echo "disconnect edge from ${param[dcedge1]} to ${param[dcedge2]}" >> $log
