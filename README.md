@@ -1,8 +1,8 @@
 # Polycule Visualiser
 
-A graph visualiser designed to be self-hosted.
+A graph visualiser designed to be self-hosted, using [Springy]
 
-See a non-editable example -> <http://alifeee.co.uk/polycule-visualiser/>
+See a non-editable example → <http://alifeee.co.uk/polycule-visualiser/>
 
 ![GIF of graph moving in a spring-like motion](./images/cule.gif)
 
@@ -65,3 +65,5 @@ location /polycule/edit {
         auth_basic_user_file /var/www/polycule/.htpasswd;
 }
 ```
+
+[Springy]: http://getspringy.com/
