@@ -20,9 +20,15 @@ while IFS='=' read -r -d '&' key value && [[ -n "$key" ]]; do
 done <<< "$(cat /dev/stdin)&"
 
 # print all vars in param array
-for key in "${!param[@]}"; do
-  echo "$key: ${param[$key]}" >> $log
-done
+# for key in "${!param[@]}"; do
+#   echo "$key: ${param[$key]}" >> $log
+# done
+echo "addnode: ${param[addnode]}" >> $log
+echo "removenode: ${param[removenode]}" >> $log
+echo "addedge1: ${param[addedge1]}" >> $log
+echo "addedge2: ${param[addedge2]}" >> $log
+echo "dcedge1: ${param[dcedge1]}" >> $log
+echo "dcedge2: ${param[dcedge2]}" >> $log
 
 # sort edges
 sortedadds=$(echo -e "${param[addedge1]}\n${param[addedge2]}" | sort)
