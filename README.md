@@ -2,6 +2,8 @@
 
 A graph visualiser designed to be self-hosted.
 
+See a non-editable example -> <http://alifeee.co.uk/polycule-visualiser/>
+
 ![GIF of graph moving in a spring-like motion](./images/cule.gif)
 
 ## How to build site
