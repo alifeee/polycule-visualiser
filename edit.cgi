@@ -40,7 +40,7 @@ param[dcedge2]=$(echo "${sorteddcs}" | tail -n1)
 
 json=$(cat $SCRIPT_DIR/polycule.json)
 echo "current json:" >> $log
-echo "${json}" >> $log
+echo "${json}" | jq -c >> $log
 
 if [ ! -z "${param[addnode]}" ]; then
   echo "add node!: ${param[addnode]}" >> $log
@@ -73,7 +73,7 @@ if [ ! -z "${param[dcedge1]}" ] && [ ! -z "${param[dcedge2]}" ]; then
 fi
 
 echo "json after:" >> $log
-echo "${json}" >> $log
+echo "${json}" | jq -c >> $log
 echo "${json}" > $SCRIPT_DIR/polycule.json
 echo "rebuilding site..." >> $log
 echo "cannot rebuild site... not able to use npm... copying json manually" >> $log
