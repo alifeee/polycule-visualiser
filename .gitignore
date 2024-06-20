@@ -7,6 +7,7 @@ _site
 # data
 polycule.json
 _data/URIs.json
+.htpasswd
 
 # log
 log
