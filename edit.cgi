@@ -64,10 +64,13 @@ if [ ! -z "${param[addedge1]}" ] && [ ! -z "${param[addedge2]}" ]; then
   echo "add edge from ${param[addedge1]} to ${param[addedge2]}" >> $log
   edge1innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addedge1]}$" | wc -l)
   edge2innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addedge2]}$" | wc -l)
+  edgeinedges=$(echo "${json}" | jq -rc '.edges | .[]' | grep -F '["'"${param[addedge1]}"'","'"${param[addedge2]}"'"]' | wc -l)
   if [ $edge1innodes != 1 ] || [ $edge2innodes != 1 ]; then
     echo "desired edge not found in edges" >> $log
   elif [ "${param[addedge1]}" == "${param[addedge2]}" ]; then
     echo "desired edges are the same, doing nothing" >> $log
+  elif [ $edgeinedges -ge 1 ]; then
+    echo "edge already in edges, doing nothing..." >> $log
   else
     json=$(echo "${json}" | jq '.edges |= .+ [["'"${param[addedge1]}"'","'"${param[addedge2]}"'"]]')
   fi
