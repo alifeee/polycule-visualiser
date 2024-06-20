@@ -40,12 +40,19 @@ param[dcedge2]=$(echo "${sorteddcs}" | tail -n1)
 
 json=$(cat $SCRIPT_DIR/polycule.json)
 echo "current json:" >> $log
-echo "${json}" >> $log
+echo "${json}" | jq -c >> $log
 
+# add node
 if [ ! -z "${param[addnode]}" ]; then
   echo "add node!: ${param[addnode]}" >> $log
-  json=$(echo "${json}" | jq '.nodes |= .+ ["'"${param[addnode]}"'"]')
+  innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addnode]}$" | wc -l)
+  if [ $innodes -lt 1 ]; then
+    json=$(echo "${json}" | jq '.nodes |= .+ ["'"${param[addnode]}"'"]')
+  else
+    echo "node already in nodes, doing nothing. \$innodes was $innodes" >> $log
+  fi
 fi
+# remove node
 if [ ! -z "${param[removenode]}" ]; then
   echo "remove node!: ${param[removenode]}" >> $log
   appearsinedges=$(echo "${json}" | jq -r '.edges | .[] | .[]' | grep "${param[removenode]}" | wc -l)
@@ -55,25 +62,30 @@ if [ ! -z "${param[removenode]}" ]; then
     echo "refusing to remove node with edges" >> $log
   fi
 fi
+# add edge
 if [ ! -z "${param[addedge1]}" ] && [ ! -z "${param[addedge2]}" ]; then
   echo "add edge from ${param[addedge1]} to ${param[addedge2]}" >> $log
   edge1innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addedge1]}$" | wc -l)
   edge2innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addedge2]}$" | wc -l)
+  edgeinedges=$(echo "${json}" | jq -rc '.edges | .[]' | grep -F '["'"${param[addedge1]}"'","'"${param[addedge2]}"'"]' | wc -l)
   if [ $edge1innodes != 1 ] || [ $edge2innodes != 1 ]; then
     echo "desired edge not found in edges" >> $log
   elif [ "${param[addedge1]}" == "${param[addedge2]}" ]; then
     echo "desired edges are the same, doing nothing" >> $log
+  elif [ $edgeinedges -ge 1 ]; then
+    echo "edge already in edges, doing nothing..." >> $log
   else
     json=$(echo "${json}" | jq '.edges |= .+ [["'"${param[addedge1]}"'","'"${param[addedge2]}"'"]]')
   fi
 fi
+# remove edge
 if [ ! -z "${param[dcedge1]}" ] && [ ! -z "${param[dcedge2]}" ]; then
   echo "disconnect edge from ${param[dcedge1]} to ${param[dcedge2]}" >> $log
   json=$(echo "${json}" | jq '.edges |= .- [["'"${param[dcedge1]}"'","'"${param[dcedge2]}"'"]]')
 fi
 
 echo "json after:" >> $log
-echo "${json}" >> $log
+echo "${json}" | jq -c >> $log
 echo "${json}" > $SCRIPT_DIR/polycule.json
 echo "rebuilding site..." >> $log
 echo "cannot rebuild site... not able to use npm... copying json manually" >> $log

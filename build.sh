@@ -1,3 +1,3 @@
 #!/bin/bash
 npm run buildit
-chown -R www-data:www-data _site
+chown -R $(whoami):www-data _site
