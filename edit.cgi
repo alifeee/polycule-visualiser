@@ -44,7 +44,12 @@ echo "${json}" | jq -c >> $log
 
 if [ ! -z "${param[addnode]}" ]; then
   echo "add node!: ${param[addnode]}" >> $log
-  json=$(echo "${json}" | jq '.nodes |= .+ ["'"${param[addnode]}"'"]')
+  innodes=$(echo "${json}" | jq -r '.nodes | .[]' | grep "^${param[addnode]}$" | wc -l)
+  if [ $innodes < 1 ]; then
+    json=$(echo "${json}" | jq '.nodes |= .+ ["'"${param[addnode]}"'"]')
+  else
+    echo "node already in nodes, doing nothing..." >> $log
+  fi
 fi
 if [ ! -z "${param[removenode]}" ]; then
   echo "remove node!: ${param[removenode]}" >> $log
