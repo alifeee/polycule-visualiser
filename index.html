@@ -115,7 +115,7 @@
                 "d",
                 `M ${a1.x} ${a1.y} L ${a2.x} ${a2.y}`
               );
-              path.setAttributeNS(null, "stroke", "#E88851");
+              path.setAttributeNS(null, "stroke", "#8878BC");
               path.setAttributeNS(null, "stroke-width", "1");
               edges.appendChild(path);
               path.addEventListener("mouseenter", makePathBig);
@@ -137,7 +137,7 @@
               text.setAttributeNS(null, "text-anchor", "middle");
               text.setAttributeNS(null, "alignment-baseline", "central");
               text.setAttributeNS(null, "dominant-baseline", "central");
-              text.setAttributeNS(null, "fill", "#96DCDD");
+              text.setAttributeNS(null, "fill", "#FFFFFF");
               let textNode = document.createTextNode(node.id);
               text.appendChild(textNode);
               nodes.appendChild(text);
@@ -150,7 +150,7 @@
               rect.setAttributeNS(null, "y", a.y - height / 2);
               rect.setAttributeNS(null, "width", width);
               rect.setAttributeNS(null, "height", height);
-              rect.setAttributeNS(null, "fill", "#A899E8");
+              rect.setAttributeNS(null, "fill", "#962727");
               rect.setAttributeNS(null, "rx", 1);
 
               rects.appendChild(rect);
@@ -179,8 +179,26 @@
         padding: 0;
         max-height: 100vh;
       }
+
+      @font-face {
+        font-family: "Hockey is Life";
+        src: url("/hockey.ttf");
+      }
+
       body {
         background-color: #ede1eb;
+        font-family: "Hockey is Life", "BogFace", sans-serif;
+        background: conic-gradient(
+            from 45deg,
+            #c44b4477 25%,
+            #bc524d77 0% 50%,
+            #af4d4877 0% 75%,
+            #db797477 0%
+          )
+          50%/ 40px 60px;
+      }
+      button {
+        font-family: "Hockey is Life", "BogFace", sans-serif;
       }
       #svg {
         width: 100%;
@@ -205,6 +223,9 @@
       #form {
         display: none;
         margin: auto;
+      }
+      #form input {
+        max-width: 6rem;
       }
       footer {
         margin-top: 1rem;
