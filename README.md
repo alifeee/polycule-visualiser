@@ -15,15 +15,29 @@ cp polycule.json.example polycule.json
 
 ### Build site
 
+We build with a script, which changes the ownership of the built files, so that the www-data user can change them later.
+
 ```bash
-npm run build
+./build.sh
+```
+
+### Develop
+
+```bash
 npm run dev
 ```
 
 ## Set up on server
 
 ```bash
+mkdir -p /var/www/
 git clone git@github.com:alifeee/polycule-visualiser /var/www/polycule
+```
+
+Generate a password file for the site
+
+```bash
+sudo htpasswd -c /var/www/polycule/.htpasswd <new_user>
 ```
 
 Add the following to nginx config (using `fastcgi`)
@@ -32,11 +46,15 @@ Add the following to nginx config (using `fastcgi`)
 location /polycule/ {
         alias /var/www/polycule/_site/;
         try_files $uri $uri/ =404;
+        auth_basic "polycule";
+        auth_basic_user_file /var/www/polycule/.htpasswd;
 }
 location /polycule/edit {
         fastcgi_intercept_errors on;
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME /var/www/polycule/edit.cgi;
         fastcgi_pass unix:/var/run/fcgiwrap.socket;
+        auth_basic "polycule";
+        auth_basic_user_file /var/www/polycule/.htpasswd;
 }
 ```
