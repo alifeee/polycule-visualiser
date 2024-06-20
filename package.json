@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "Editable polycule website",
   "scripts": {
-    "build": "eleventy",
+    "build": "echo 'you should use ./build.sh'",
+    "buildit": "eleventy",
     "dev": "eleventy --serve"
   },
   "repository": {
