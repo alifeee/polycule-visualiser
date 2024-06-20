@@ -1,12 +1,37 @@
 {
-  "nodes": ["Ash", "Bri", "Ciar", "Darl", "Elfo", "France", "George"],
+  "nodes": [
+    "This",
+    "is",
+    "an",
+    "example",
+    "See",
+    "the",
+    "sourcecode"
+  ],
   "edges": [
-    ["Ash", "Bri"],
-    ["Ash", "Ciar"],
-    ["Bri", "Darl"],
-    ["Ciar", "Elfo"],
-    ["Elfo", "George"],
-    ["Elfo", "France"],
-    ["Bri", "Elfo"]
+    [
+      "This",
+      "is"
+    ],
+    [
+      "is",
+      "an"
+    ],
+    [
+      "an",
+      "example"
+    ],
+    [
+      "is",
+      "sourcecode"
+    ],
+    [
+      "See",
+      "the"
+    ],
+    [
+      "the",
+      "sourcecode"
+    ]
   ]
 }
