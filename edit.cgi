@@ -19,10 +19,16 @@ while IFS='=' read -r -d '&' key value && [[ -n "$key" ]]; do
     param["$key"]=$value
 done <<< "$(cat /dev/stdin)&"
 
+# decode URI components
+function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
+param[addnode]=$(urldecode "${param[addnode]}")
+param[removenode]=$(urldecode "${param[removenode]}")
+param[addedge1]=$(urldecode "${param[addedge1]}")
+param[addedge2]=$(urldecode "${param[addedge2]}")
+param[dcedge1]=$(urldecode "${param[dcedge1]}")
+param[dcedge2]=$(urldecode "${param[dcedge2]}")
+
 # print all vars in param array
-# for key in "${!param[@]}"; do
-#   echo "$key: ${param[$key]}" >> $log
-# done
 echo "addnode: ${param[addnode]}" >> $log
 echo "removenode: ${param[removenode]}" >> $log
 echo "addedge1: ${param[addedge1]}" >> $log
