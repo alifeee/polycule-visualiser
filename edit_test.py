@@ -8,6 +8,7 @@ from edit import (
     assemble_graph,
     create_node,
     delete_node,
+    rename_node,
     create_edge,
     delete_edge,
 )
@@ -79,5 +80,22 @@ errors, graph = create_edge(original_graph, [], ["alifeee", "Paul"])
 assert (
     len(errors) == 0 and Edge("alifeee", "Paul") in parse_graph(graph)[1]
 ), "failed to add edge"
+
+# test rename node
+errors, graph = rename_node(original_graph, [], ["Homer", "Alfie"])
+assert len(errors) == 1, "rename_node did not complain about nonexistent node"
+
+errors, graph = rename_node(original_graph, [], ["alifeee", "jman"])
+assert len(errors) == 1, "rename_node did not complain about existent renamed node"
+
+errors, graph = rename_node(original_graph, [], ["alifeee", "Alfie"])
+assert (
+    len(errors) == 0
+    and (Node("alifeee") not in parse_graph(graph)[0])
+    and (Node("Alfie") in parse_graph(graph)[0])
+), "rename_node did not successfully rename node"
+assert (Edge("Alfie", "jman") in parse_graph(graph)[1]) and (
+    Edge("Alfie", "somebody") in parse_graph(graph)[1]
+), "rename_node did not rename relevant edges"
 
 print("tests passed ok !")
