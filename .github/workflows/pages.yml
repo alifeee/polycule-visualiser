@@ -29,16 +29,10 @@ jobs:
       - name: Rename json file
         run: cp polycule.json.example polycule.json
 
-      - name: Rename base URI file
-        run: cp _data/URIs.json.example _data/URIs.json
-
-      - name: Build
-        run: npm run buildit
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./_site"
+          path: "."
 
   deploy:
     environment:
