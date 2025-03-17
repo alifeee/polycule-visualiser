@@ -17,17 +17,22 @@ from edit import (
 assert Node("alifeee") == Node("alifeee"), "nodes do not equate"
 
 # edges equate
-assert Edge("alifeee", "jman") == Edge("alifeee", "jman"), "nodes do not equate"
-assert Edge("alifeee", "jman") == Edge(
-    "jman", "alifeee"
-), "nodes with swapped to/from do not equate"
+assert Edge("alifeee", "jman", type_="normal") == Edge(
+    "alifeee", "jman", type_="normal"
+), "edges do not equate"
+assert Edge("alifeee", "jman", type_="normal") == Edge(
+    "jman", "alifeee", type_="normal"
+), "edges with swapped to/from do not equate"
+assert Edge("alifeee", "jman", type_="normal") == Edge(
+    "alifeee", "jman", type_="dashed"
+), "edges with different types should equate but they do not"
 
 # set up "identical" graphs
-graph_json = '{"nodes":[{"name":"alifeee"},{"name":"jman"},{"name":"somebody"},{"name":"Paul"}],"edges":[{"from":"alifeee","to":"jman"},{"from":"alifeee","to":"somebody"}]}'
+graph_json = '{"nodes":[{"name":"alifeee"},{"name":"jman"},{"name":"somebody"},{"name":"Paul"}],"edges":[{"from":"alifeee","to":"jman"},{"from":"alifeee","to":"somebody","type":"dashed"}]}'
 original_graph = json.loads(graph_json)
 
 nodes = [Node("jman"), Node("somebody"), Node("alifeee"), Node("Paul")]
-edges = [Edge("alifeee", "jman"), Edge("somebody", "alifeee")]
+edges = [Edge("alifeee", "jman", type_=""), Edge("somebody", "alifeee", type_="dashed")]
 
 # test parse_graph
 graph_nodes, graph_edges = parse_graph(original_graph)
@@ -41,7 +46,7 @@ for edge in graph_edges:
 # test assemble_graph
 assert (
     json.dumps(assemble_graph(nodes, edges))
-    == '{"nodes": [{"name": "jman"}, {"name": "somebody"}, {"name": "alifeee"}, {"name": "Paul"}], "edges": [{"from": "alifeee", "to": "jman"}, {"from": "somebody", "to": "alifeee"}]}'
+    == '{"nodes": [{"name": "jman"}, {"name": "somebody"}, {"name": "alifeee"}, {"name": "Paul"}], "edges": [{"from": "alifeee", "to": "jman"}, {"from": "somebody", "to": "alifeee", "type": "dashed"}]}'
 ), "assemble_graph did badly"
 
 # test delete node
@@ -69,17 +74,24 @@ assert len(errors) == 1, "non-existent edge was not caught"
 
 errors, graph = delete_edge(original_graph, [], ["alifeee", "jman"])
 assert (
-    len(errors) == 0 and Edge("alifeee", "jman") not in parse_graph(graph)[1]
+    len(errors) == 0 and Edge("alifeee", "jman", "") not in parse_graph(graph)[1]
 ), "failed to delete edge"
 
 # test create edge
 errors, graph = create_edge(original_graph, [], ["alifeee", "jman"])
-assert len(errors) == 1, "create edge did not catch already-existing edge"
+assert len(graph["edges"]) == len(
+    original_graph["edges"]
+), "create edge did not catch already-existing edge"
 
 errors, graph = create_edge(original_graph, [], ["alifeee", "Paul"])
 assert (
-    len(errors) == 0 and Edge("alifeee", "Paul") in parse_graph(graph)[1]
+    len(errors) == 0 and Edge("alifeee", "Paul", "") in parse_graph(graph)[1]
 ), "failed to add edge"
+
+errors, graph = create_edge(original_graph, [], ["alifeee", "Paul"], dashed=True)
+assert len(errors) == 0 and (
+    parse_graph(graph)[1][-1].type_ == "dashed"
+), "failed to add edge as dashed"
 
 # test rename node
 errors, graph = rename_node(original_graph, [], ["Homer", "Alfie"])
@@ -94,8 +106,19 @@ assert (
     and (Node("alifeee") not in parse_graph(graph)[0])
     and (Node("Alfie") in parse_graph(graph)[0])
 ), "rename_node did not successfully rename node"
-assert (Edge("Alfie", "jman") in parse_graph(graph)[1]) and (
-    Edge("Alfie", "somebody") in parse_graph(graph)[1]
+assert (Edge("Alfie", "jman", "") in parse_graph(graph)[1]) and (
+    Edge("Alfie", "somebody", "") in parse_graph(graph)[1]
 ), "rename_node did not rename relevant edges"
+
+# test that functions preserve edge types
+errors, graph = create_node(original_graph, [], "newnode")
+errors, graph = delete_node(graph, [], "newnode")
+errors, graph = create_node(graph, [], "newnode")
+errors, graph = create_edge(graph, [], ["somebody", "jman"])
+errors, graph = delete_edge(graph, [], ["somebody", "jman"])
+errors, graph = rename_node(graph, [], ["jman", "jfiddy"])
+assert {"from": "alifeee", "to": "somebody", "type": "dashed"} in graph[
+    "edges"
+], "functions did not preserve edge type"
 
 print("tests passed ok !")

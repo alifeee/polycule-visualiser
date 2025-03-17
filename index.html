@@ -129,7 +129,9 @@
                 `M ${a1.x} ${a1.y} L ${a2.x} ${a2.y}`
               );
               path.setAttributeNS(null, "stroke", "#8878BC");
-              // path.setAttributeNS(null, "stroke-dasharray", "0.5");
+              if (edge.data?.type == "dashed") {
+                path.setAttributeNS(null, "stroke-dasharray", stroke_width / 2);
+              }
               path.setAttributeNS(null, "stroke-width", stroke_width);
               edges.appendChild(path);
               path.addEventListener("mouseenter", makePathBig);
@@ -277,6 +279,11 @@
         <input type="text" id="addedge1" name="addedge1" />
         <label for="addedge2">to</label>
         <input type="text" id="addedge2" name="addedge2" />
+
+        <br />
+
+        <label for="dashed">Dashed?</label>
+        <input type="checkbox" id="dashed" name="dashed" />
 
         <br />
 

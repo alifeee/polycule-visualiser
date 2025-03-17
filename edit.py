@@ -30,6 +30,7 @@ class Node:
 class Edge:
     from_: str
     to: str
+    type_: str
 
     def __eq__(self, other):
         if isinstance(other, Edge):
@@ -47,6 +48,7 @@ class RequestData:
     node_rename: Tuple[str]
     edge_delete: Tuple[str]
     edge_create: Tuple[str]
+    dashed: bool
 
 
 def debug(msg):
@@ -67,14 +69,21 @@ def cgi_error(error: str):
 
 def parse_graph(graph) -> Tuple[List[Node], List[Edge]]:
     nodes = [Node(n["name"]) for n in graph["nodes"]]
-    edges = [Edge(n["from"], n["to"]) for n in graph["edges"]]
+    edges = [Edge(e["from"], e["to"], e.get("type", "")) for e in graph["edges"]]
     return nodes, edges
 
 
 def assemble_graph(nodes: List[Node], edges: List[Edge]) -> object:
     return {
         "nodes": [{"name": n.name} for n in nodes],
-        "edges": [{"from": e.from_, "to": e.to} for e in edges],
+        "edges": [
+            {
+                "from": e.from_,
+                "to": e.to,
+                **{key: value for (key, value) in [["type", e.type_]] if e.type_ != ""},
+            }
+            for e in edges
+        ],
     }
 
 
@@ -140,20 +149,20 @@ def delete_edge(graph, errors, edge_todel):
     # edge case checks
     if edge_todel is None:
         return errors, graph
-    edge = Edge(*edge_todel)
+    edge = Edge(*edge_todel, "")
     if edge not in edges:
         errors.append(
             "DELETE EDGE: " f"could not delete {edge_todel} as it did not exist"
         )
         return errors, graph
 
-    edges = [e for e in edges if e != Edge(*edge_todel)]
+    edges = [e for e in edges if e != Edge(*edge_todel, "")]
 
     debug(f" returning graph with {len(nodes)} nodes and {len(edges)} edges")
     return errors, assemble_graph(nodes, edges)
 
 
-def create_edge(graph, errors, edge_toadd):
+def create_edge(graph, errors, edge_toadd, dashed: bool = False):
     nodes, edges = parse_graph(graph)
 
     debug("CREATE EDGE")
@@ -164,10 +173,12 @@ def create_edge(graph, errors, edge_toadd):
     # edge case checks
     if edge_toadd is None:
         return errors, graph
-    edge = Edge(*edge_toadd)
+    edge = Edge(*edge_toadd, "dashed" if dashed else "")
     if edge in edges:
-        errors.append("ADD EDGE: " f"edge {edge_toadd} was already in edges")
-        return errors, graph
+        # errors.append("ADD EDGE: " f"edge {edge_toadd} was already in edges")
+        # return errors, graph
+        # remove for re-adding
+        edges.remove(edge)
 
     edges.append(edge)
 
@@ -199,8 +210,12 @@ def rename_node(graph, errors, node_torename):
         return errors, graph
 
     nodes = [(n if n.name != rename_from else Node(rename_to)) for n in nodes]
-    edges = [(e if e.from_ != rename_from else Edge(rename_to, e.to)) for e in edges]
-    edges = [(e if e.to != rename_from else Edge(e.from_, rename_to)) for e in edges]
+    edges = [
+        (e if e.from_ != rename_from else Edge(rename_to, e.to, e.type_)) for e in edges
+    ]
+    edges = [
+        (e if e.to != rename_from else Edge(e.from_, rename_to, e.type_)) for e in edges
+    ]
 
     debug(f" returning graph with {len(nodes)} nodes and {len(edges)} edges")
     return errors, assemble_graph(nodes, edges)
@@ -225,7 +240,7 @@ def main(args):
     errors, data = delete_node(data, errors, args.node_delete)
     # create
     errors, data = create_node(data, errors, args.node_create)
-    errors, data = create_edge(data, errors, args.edge_create)
+    errors, data = create_edge(data, errors, args.edge_create, dashed=args.dashed)
     # rename
     errors, data = rename_node(data, errors, args.node_rename)
 
@@ -259,6 +274,7 @@ if __name__ == "__main__":
     parser.add_argument("-nr", "--node-rename", type=str, nargs=2)
     parser.add_argument("-ed", "--edge-delete", type=str, nargs=2)
     parser.add_argument("-ec", "-ea", "--edge-create", type=str, nargs=2)
+    parser.add_argument("--dashed", action="store_true", help="make edge dashed")
     parser.add_argument(
         "-d",
         "--dry-run",
@@ -302,9 +318,11 @@ if __name__ == "__main__":
                 [addedge1, addedge2] if None not in [addedge1, addedge2] else None
             ),
             edge_delete=[dcedge1, dcedge2] if None not in [dcedge1, dcedge2] else None,
+            dashed=query.get("dashed") == "on",
         )
 
     debug("")
     debug(f"starting edit request {datetime.now()}")
+    debug(f"{args}")
 
     main(args)
