@@ -5,9 +5,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <script src="jquery.min.js"></script>
-    <script src="springy.js"></script>
-    <script src="springyui.js"></script>
+    <script src="./public/jquery.min.js"></script>
+    <script src="./springy/springy.js"></script>
+    <script src="./springy/springyui.js"></script>
     <script>
       let lastClicked = null;
       function clearForm(form) {
@@ -17,12 +17,6 @@
         }
       }
 
-      function makePathBig(ev) {
-        ev.target.setAttributeNS(null, "stroke-width", "2");
-      }
-      function makePathSmall(ev) {
-        ev.target.setAttributeNS(null, "stroke-width", "1");
-      }
       function pathCallBack(node1, node2) {
         return function (ev) {
           let form = document.getElementById("form");
@@ -55,7 +49,19 @@
         .then((data) => data.json())
         .then((json) => {
           let graph = new Springy.Graph();
-          graph.loadJSON(json);
+
+          const num_nodes = json["nodes"].length;
+          const stroke_width = 10 / num_nodes;
+          const text_size = 40 / num_nodes;
+
+          json["nodes"].forEach((n) => {
+            graph.addNodes(n.name);
+          });
+          json["edges"].forEach((e) => {
+            graph.addEdges([e.from, e.to, { type: e.type }]);
+          });
+
+          // graph.loadJSON(json);
           //   var springy = jQuery("#springydemo").springy({
           //     graph: graph,
           //   });
@@ -94,6 +100,13 @@
             return transfomed;
           }
 
+          function makePathBig(ev) {
+            ev.target.setAttributeNS(null, "stroke-width", stroke_width * 2);
+          }
+          function makePathSmall(ev) {
+            ev.target.setAttributeNS(null, "stroke-width", stroke_width);
+          }
+
           let renderer = new Springy.Renderer(
             layout,
             function clear() {
@@ -116,7 +129,8 @@
                 `M ${a1.x} ${a1.y} L ${a2.x} ${a2.y}`
               );
               path.setAttributeNS(null, "stroke", "#8878BC");
-              path.setAttributeNS(null, "stroke-width", "1");
+              // path.setAttributeNS(null, "stroke-dasharray", "0.5");
+              path.setAttributeNS(null, "stroke-width", stroke_width);
               edges.appendChild(path);
               path.addEventListener("mouseenter", makePathBig);
               path.addEventListener("mouseleave", makePathSmall);
@@ -133,7 +147,7 @@
               let text = document.createElementNS(NS, "text");
               text.setAttributeNS(null, "x", a.x);
               text.setAttributeNS(null, "y", a.y);
-              text.setAttributeNS(null, "font-size", 5);
+              text.setAttributeNS(null, "font-size", text_size);
               text.setAttributeNS(null, "text-anchor", "middle");
               text.setAttributeNS(null, "alignment-baseline", "central");
               text.setAttributeNS(null, "dominant-baseline", "central");
@@ -182,7 +196,7 @@
 
       @font-face {
         font-family: "Hockey is Life";
-        src: url("hockey.ttf");
+        src: url("./public/hockey.ttf");
       }
 
       body {
@@ -248,12 +262,7 @@
     </svg>
     <section class="edit">
       <button onclick='$("#form").toggle()'>edit...</button>
-      <form
-        action="{{URIs.root}}/polycule/edit.cgi"
-        method="post"
-        id="form"
-        autocomplete="off"
-      >
+      <form action="./edit" method="post" id="form" autocomplete="off">
         <label for="addnode">Add new node</label>
         <input type="text" id="addnode" name="addnode" />
 

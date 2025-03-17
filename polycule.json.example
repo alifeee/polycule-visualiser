@@ -1,37 +1,51 @@
 {
   "nodes": [
-    "This",
-    "is",
-    "an",
-    "example",
-    "See",
-    "the",
-    "sourcecode"
+    {
+      "name": "This"
+    },
+    {
+      "name": "is"
+    },
+    {
+      "name": "an"
+    },
+    {
+      "name": "example"
+    },
+    {
+      "name": "See"
+    },
+    {
+      "name": "the"
+    },
+    {
+      "name": "sourcecode"
+    }
   ],
   "edges": [
-    [
-      "This",
-      "is"
-    ],
-    [
-      "is",
-      "an"
-    ],
-    [
-      "an",
-      "example"
-    ],
-    [
-      "is",
-      "sourcecode"
-    ],
-    [
-      "See",
-      "the"
-    ],
-    [
-      "the",
-      "sourcecode"
-    ]
+    {
+      "from": "This",
+      "to": "is"
+    },
+    {
+      "from": "is",
+      "to": "an"
+    },
+    {
+      "from": "an",
+      "to": "example"
+    },
+    {
+      "from": "is",
+      "to": "sourcecode"
+    },
+    {
+      "from": "See",
+      "to": "the"
+    },
+    {
+      "from": "the",
+      "to": "sourcecode"
+    }
   ]
 }
