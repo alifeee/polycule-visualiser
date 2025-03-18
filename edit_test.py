@@ -83,6 +83,12 @@ assert len(graph["edges"]) == len(
     original_graph["edges"]
 ), "create edge did not catch already-existing edge"
 
+errors, graph = create_edge(original_graph, [], ["Marge", "alifeee"])
+assert len(errors) > 0, "create_edge did not error for non-existent edge - 1st"
+
+errors, graph = create_edge(original_graph, [], ["alifeee", "Marge"])
+assert len(errors) > 0, "create_edge did not error for non-existent edge - 2nd"
+
 errors, graph = create_edge(original_graph, [], ["alifeee", "Paul"])
 assert (
     len(errors) == 0 and Edge("alifeee", "Paul", "") in parse_graph(graph)[1]

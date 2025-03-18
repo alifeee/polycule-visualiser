@@ -174,6 +174,13 @@ def create_edge(graph, errors, edge_toadd, dashed: bool = False):
     if edge_toadd is None:
         return errors, graph
     edge = Edge(*edge_toadd, "dashed" if dashed else "")
+    if (Node(edge.from_) not in nodes) or (Node(edge.to) not in nodes):
+        errors.append(
+            "ADD EDGE: "
+            f"edge {edge_toadd} could not be added as "
+            "one of the nodes to connect did not exist"
+        )
+        return errors, graph
     if edge in edges:
         # errors.append("ADD EDGE: " f"edge {edge_toadd} was already in edges")
         # return errors, graph
