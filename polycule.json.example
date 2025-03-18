@@ -1,51 +1,51 @@
 {
-  "nodes": [
-    {
-      "name": "This"
-    },
-    {
-      "name": "is"
-    },
-    {
-      "name": "an"
-    },
-    {
-      "name": "example"
-    },
-    {
-      "name": "See"
-    },
-    {
-      "name": "the"
-    },
-    {
-      "name": "sourcecode"
-    }
-  ],
-  "edges": [
-    {
-      "from": "This",
-      "to": "is"
-    },
-    {
-      "from": "is",
-      "to": "an"
-    },
-    {
-      "from": "an",
-      "to": "example"
-    },
-    {
-      "from": "is",
-      "to": "sourcecode"
-    },
-    {
-      "from": "See",
-      "to": "the"
-    },
-    {
-      "from": "the",
-      "to": "sourcecode"
-    }
-  ]
+ "nodes": [
+  {
+   "name": "This"
+  },
+  {
+   "name": "is"
+  },
+  {
+   "name": "sourcecode"
+  },
+  {
+   "name": "website"
+  },
+  {
+   "name": "available"
+  },
+  {
+   "name": "an example"
+  }
+ ],
+ "edges": [
+  {
+   "from": "This",
+   "to": "website"
+  },
+  {
+   "from": "website",
+   "to": "is"
+  },
+  {
+   "from": "an example",
+   "to": "is"
+  },
+  {
+   "from": "website",
+   "to": "sourcecode",
+   "type": "dashed"
+  },
+  {
+   "from": "sourcecode",
+   "to": "is",
+   "type": "dashed"
+  },
+  {
+   "from": "is",
+   "to": "available",
+   "type": "dashed"
+  }
+ ]
 }
