@@ -48,13 +48,13 @@ location /polycule/ {
     auth_basic_user_file /etc/nginx/polycule.htpasswd;
     auth_basic "polycule";
 }
-location /polycule/edit {
+location ~ ^(/polycule/edit|/polycule/rss) {
     fastcgi_intercept_errors on;
     include fastcgi_params;
-    fastcgi_param SCRIPT_FILENAME /usr/alifeee/polycule/edit.py;
+    fastcgi_param SCRIPT_FILENAME /usr/alifeee$fastcgi_script_name;
     fastcgi_pass unix:/var/run/fcgiwrap.socket;
 
-    auth_basic_user_file /etc/nginx/polycule.htpasswd;
+    auth_basic_user_file /var/www/polycule/.htpasswd;
     auth_basic "polycule";
 }
 ```
