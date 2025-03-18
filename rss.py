@@ -21,7 +21,7 @@ print(
     f"""<?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>polycule</title>
-    <link href='https://server.alifeee.net/polycule/index.xml' rel='self' />
+    <link href='https://server.alifeee.net/polycule/rss' rel='self' />
     <updated>{mod_datetime.isoformat()}</updated>
     <author>
         <name>alifeee</name>
