@@ -267,9 +267,16 @@ def main(args):
         debug("dry run complete! quitting now")
         return
     debug(f"writing to file {FILE}")
-    with open(FILE, "w", encoding="utf-8") as file:
-        # json.dump(data, file, indent=" ")
-        yaml.dump(data, file)
+    try:
+        with open(FILE, "w", encoding="utf-8") as file:
+            # json.dump(data, file, indent=" ")
+            yaml.dump(data, file)
+    except PermissionError:
+        print("Content-type: text/plain")
+        print()
+        print('could not edit file, web-user "www-data" does not have permission')
+        print("contact site owner")
+        return
 
     print("HTTP/1.1 303 See Other")
     print("Location: /polycule/")
