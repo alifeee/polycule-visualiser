@@ -6,35 +6,40 @@ See a non-editable example → <http://alifeee.co.uk/polycule-visualiser/>
 
 ![GIF of graph moving in a spring-like motion](./images/cule.gif)
 
-## How to build site
+The graph is defined by YAML:
 
-### Install
-
-Install dependencies & copy site-specific data files.
-
-```bash
-cp polycule.json.example polycule.json
-nano polycule.json
+```yaml
+nodes:
+  - name: Seraphina
+  - name: Elfo
+  - name: France
+edges:
+  - from: Seraphina
+    to: Elfo
+  - from: Elfo
+    to: France
+    type: dashed
 ```
 
-### Build site
+## How to use locally
 
-We change the ownership of the built files, so that the www-data user can change them later.
+1. Download the files ([as a zip](https://github.com/alifeee/polycule-visualiser/archive/refs/heads/main.zip)) and extract to a folder
+1. open `index.html` with a text editor (Notepad/etc)
+1. edit the polycule at the top of the file
+1. open (double click or open in browser) `index.html`
 
-```bash
-sudo chown $USER:www-data polycule.json
-```
-
-## Set up on server
+## How to install on a server with editing
 
 ```bash
 mkdir -p /var/www/
 git clone git@github.com:alifeee/polycule-visualiser /var/www/polycule
-```
+cd /var/www/polycule
 
-Generate a password file for the site
+cp polycule.yaml.example polycule.yaml
+# We change the ownership of the built files, so that the www-data user can change them later.
+sudo chown $USER:www-data polycule.yaml
 
-```bash
+# Generate a password file for the site
 sudo htpasswd -c /etc/nginx/polycule.htpasswd <new_user>
 ```
 

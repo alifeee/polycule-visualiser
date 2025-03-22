@@ -5,6 +5,36 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <script>
+      // use the file polycule.yaml instead if this website is on a server
+      // if you open index.html locally as a file you can change the below
+      const polycule_yaml = `
+nodes:
+- name: This
+- name: is
+- name: sourcecode
+- name: website
+- name: available
+- name: an example
+edges:
+- from: This
+  to: website
+- from: website
+  to: is
+- from: an example
+  to: is
+- from: website
+  to: sourcecode
+  type: dashed
+- from: sourcecode
+  to: is
+  type: dashed
+- from: is
+  to: available
+  type: dashed
+      `;
+    </script>
+
     <script src="./public/jquery.min.js"></script>
     <script src="./public/js-yaml.min.js"></script>
     <script src="./springy/springy.js"></script>
@@ -46,162 +76,178 @@
         };
       }
 
-      fetch("polycule.yaml", { cache: "no-store" })
-        .then((data) => data.text())
-        .then((text) => {
-          const obj = jsyaml.load(text);
-          return obj;
-        })
-        .catch((e) => {
-          console.log("yaml did not load");
-          console.log(e);
-          const errorsec = document.querySelector(".errors");
-          const pre = document.createElement("pre");
-          pre.innerText =
-            "something went wrong with loading yaml\n" + e.message;
-          errorsec.appendChild(pre);
-          errorsec.classList.remove("invisible");
-        })
-        .then((json) => {
-          // fetch("polycule.json", { cache: "no-store" })
-          //   .then((data) => data.json())
-          //   .then((json) => {
-          let graph = new Springy.Graph();
+      function make_graph(json) {
+        let graph = new Springy.Graph();
 
-          const num_nodes = json["nodes"].length;
-          const stroke_width = 10 / num_nodes;
-          const text_size = 40 / num_nodes;
+        const num_nodes = json["nodes"].length;
+        const stroke_width = 10 / num_nodes;
+        const text_size = 40 / num_nodes;
 
-          json["nodes"].forEach((n) => {
-            graph.addNodes(n.name);
-          });
-          json["edges"].forEach((e) => {
-            graph.addEdges([e.from, e.to, { type: e.type }]);
-          });
-
-          // graph.loadJSON(json);
-          //   var springy = jQuery("#springydemo").springy({
-          //     graph: graph,
-          //   });
-          let layout = new Springy.Layout.ForceDirected(
-            graph,
-            400.0,
-            400.0,
-            0.5
-          );
-
-          let svg = document.getElementById("svg");
-          let rects = svg.getElementById("rects");
-          let clickrects = svg.getElementById("clickrects");
-          let edges = svg.getElementById("edges");
-          let nodes = svg.getElementById("nodes");
-          let svg_bbox = {
-            bottomleft: { x: 10, y: 90 },
-            topright: { x: 90, y: 10 },
-          };
-
-          function transform_coordinates(fromcorners, tocorners, point) {
-            b1x = fromcorners.bottomleft.x;
-            b1y = fromcorners.bottomleft.y;
-            b2x = fromcorners.topright.x;
-            b2y = fromcorners.topright.y;
-
-            s1x = tocorners.bottomleft.x;
-            s1y = tocorners.bottomleft.y;
-            s2x = tocorners.topright.x;
-            s2y = tocorners.topright.y;
-
-            let transfomed = {
-              x: s1x + ((s2x - s1x) / (b2x - b1x)) * (point.x - b1x),
-              y: s1y + ((s2y - s1y) / (b2y - b1y)) * (point.y - b1y),
-            };
-            return transfomed;
-          }
-
-          function makePathBig(ev) {
-            ev.target.setAttributeNS(null, "stroke-width", stroke_width * 2);
-          }
-          function makePathSmall(ev) {
-            ev.target.setAttributeNS(null, "stroke-width", stroke_width);
-          }
-
-          let renderer = new Springy.Renderer(
-            layout,
-            function clear() {
-              for (group of [nodes, edges, rects, clickrects]) {
-                while (group.lastChild) {
-                  group.removeChild(group.lastChild);
-                }
-              }
-            },
-            function drawEdge(edge, p1, p2) {
-              //   draw edge
-              let boundingbox = layout.getBoundingBox();
-              a1 = transform_coordinates(boundingbox, svg_bbox, p1);
-              a2 = transform_coordinates(boundingbox, svg_bbox, p2);
-              let NS = "http://www.w3.org/2000/svg";
-              let path = document.createElementNS(NS, "path");
-              path.setAttributeNS(
-                null,
-                "d",
-                `M ${a1.x} ${a1.y} L ${a2.x} ${a2.y}`
-              );
-              path.setAttributeNS(null, "stroke", "#8878BC");
-              if (edge.data?.type == "dashed") {
-                path.setAttributeNS(null, "stroke-dasharray", stroke_width / 2);
-              }
-              path.setAttributeNS(null, "stroke-width", stroke_width);
-              edges.appendChild(path);
-              path.addEventListener("mouseenter", makePathBig);
-              path.addEventListener("mouseleave", makePathSmall);
-              path.addEventListener(
-                "click",
-                pathCallBack(edge.source.id, edge.target.id)
-              );
-            },
-            function drawNode(node, p) {
-              let boundingbox = layout.getBoundingBox();
-              a = transform_coordinates(boundingbox, svg_bbox, p);
-              let NS = "http://www.w3.org/2000/svg";
-
-              let text = document.createElementNS(NS, "text");
-              text.setAttributeNS(null, "x", a.x);
-              text.setAttributeNS(null, "y", a.y);
-              text.setAttributeNS(null, "font-size", text_size);
-              text.setAttributeNS(null, "text-anchor", "middle");
-              text.setAttributeNS(null, "alignment-baseline", "central");
-              text.setAttributeNS(null, "dominant-baseline", "central");
-              text.setAttributeNS(null, "fill", "#FFFFFF");
-              let textNode = document.createTextNode(node.id);
-              text.appendChild(textNode);
-              nodes.appendChild(text);
-
-              let bbox = text.getBBox();
-              let width = bbox.width * 1.1;
-              let height = bbox.height * 1.2;
-              let rect = document.createElementNS(NS, "rect");
-              rect.setAttributeNS(null, "x", a.x - width / 2);
-              rect.setAttributeNS(null, "y", a.y - height / 2);
-              rect.setAttributeNS(null, "width", width);
-              rect.setAttributeNS(null, "height", height);
-              rect.setAttributeNS(null, "fill", "#962727");
-              rect.setAttributeNS(null, "rx", 1);
-
-              rects.appendChild(rect);
-
-              let clickrect = document.createElementNS(NS, "rect");
-              clickrect.setAttributeNS(null, "x", a.x - width / 2);
-              clickrect.setAttributeNS(null, "y", a.y - height / 2);
-              clickrect.setAttributeNS(null, "width", width);
-              clickrect.setAttributeNS(null, "height", height);
-              clickrect.setAttributeNS(null, "fill", "#0000");
-              clickrect.setAttributeNS(null, "rx", 1);
-              clickrects.appendChild(clickrect);
-              clickrect.addEventListener("click", nodeCallBack(node.id));
-            }
-          );
-          renderer.start();
+        json["nodes"].forEach((n) => {
+          graph.addNodes(n.name);
         });
+        json["edges"].forEach((e) => {
+          graph.addEdges([e.from, e.to, { type: e.type }]);
+        });
+
+        // graph.loadJSON(json);
+        //   var springy = jQuery("#springydemo").springy({
+        //     graph: graph,
+        //   });
+        let layout = new Springy.Layout.ForceDirected(graph, 400.0, 400.0, 0.5);
+
+        let svg = document.getElementById("svg");
+        let rects = svg.getElementById("rects");
+        let clickrects = svg.getElementById("clickrects");
+        let edges = svg.getElementById("edges");
+        let nodes = svg.getElementById("nodes");
+        let svg_bbox = {
+          bottomleft: { x: 10, y: 90 },
+          topright: { x: 90, y: 10 },
+        };
+
+        function transform_coordinates(fromcorners, tocorners, point) {
+          b1x = fromcorners.bottomleft.x;
+          b1y = fromcorners.bottomleft.y;
+          b2x = fromcorners.topright.x;
+          b2y = fromcorners.topright.y;
+
+          s1x = tocorners.bottomleft.x;
+          s1y = tocorners.bottomleft.y;
+          s2x = tocorners.topright.x;
+          s2y = tocorners.topright.y;
+
+          let transfomed = {
+            x: s1x + ((s2x - s1x) / (b2x - b1x)) * (point.x - b1x),
+            y: s1y + ((s2y - s1y) / (b2y - b1y)) * (point.y - b1y),
+          };
+          return transfomed;
+        }
+
+        function makePathBig(ev) {
+          ev.target.setAttributeNS(null, "stroke-width", stroke_width * 2);
+        }
+        function makePathSmall(ev) {
+          ev.target.setAttributeNS(null, "stroke-width", stroke_width);
+        }
+
+        let renderer = new Springy.Renderer(
+          layout,
+          function clear() {
+            for (group of [nodes, edges, rects, clickrects]) {
+              while (group.lastChild) {
+                group.removeChild(group.lastChild);
+              }
+            }
+          },
+          function drawEdge(edge, p1, p2) {
+            //   draw edge
+            let boundingbox = layout.getBoundingBox();
+            a1 = transform_coordinates(boundingbox, svg_bbox, p1);
+            a2 = transform_coordinates(boundingbox, svg_bbox, p2);
+            let NS = "http://www.w3.org/2000/svg";
+            let path = document.createElementNS(NS, "path");
+            path.setAttributeNS(
+              null,
+              "d",
+              `M ${a1.x} ${a1.y} L ${a2.x} ${a2.y}`
+            );
+            path.setAttributeNS(null, "stroke", "#8878BC");
+            if (edge.data?.type == "dashed") {
+              path.setAttributeNS(null, "stroke-dasharray", stroke_width / 2);
+            }
+            path.setAttributeNS(null, "stroke-width", stroke_width);
+            edges.appendChild(path);
+            path.addEventListener("mouseenter", makePathBig);
+            path.addEventListener("mouseleave", makePathSmall);
+            path.addEventListener(
+              "click",
+              pathCallBack(edge.source.id, edge.target.id)
+            );
+          },
+          function drawNode(node, p) {
+            let boundingbox = layout.getBoundingBox();
+            a = transform_coordinates(boundingbox, svg_bbox, p);
+            let NS = "http://www.w3.org/2000/svg";
+
+            let text = document.createElementNS(NS, "text");
+            text.setAttributeNS(null, "x", a.x);
+            text.setAttributeNS(null, "y", a.y);
+            text.setAttributeNS(null, "font-size", text_size);
+            text.setAttributeNS(null, "text-anchor", "middle");
+            text.setAttributeNS(null, "alignment-baseline", "central");
+            text.setAttributeNS(null, "dominant-baseline", "central");
+            text.setAttributeNS(null, "fill", "#FFFFFF");
+            let textNode = document.createTextNode(node.id);
+            text.appendChild(textNode);
+            nodes.appendChild(text);
+
+            let bbox = text.getBBox();
+            let width = bbox.width * 1.1;
+            let height = bbox.height * 1.2;
+            let rect = document.createElementNS(NS, "rect");
+            rect.setAttributeNS(null, "x", a.x - width / 2);
+            rect.setAttributeNS(null, "y", a.y - height / 2);
+            rect.setAttributeNS(null, "width", width);
+            rect.setAttributeNS(null, "height", height);
+            rect.setAttributeNS(null, "fill", "#962727");
+            rect.setAttributeNS(null, "rx", 1);
+
+            rects.appendChild(rect);
+
+            let clickrect = document.createElementNS(NS, "rect");
+            clickrect.setAttributeNS(null, "x", a.x - width / 2);
+            clickrect.setAttributeNS(null, "y", a.y - height / 2);
+            clickrect.setAttributeNS(null, "width", width);
+            clickrect.setAttributeNS(null, "height", height);
+            clickrect.setAttributeNS(null, "fill", "#0000");
+            clickrect.setAttributeNS(null, "rx", 1);
+            clickrects.appendChild(clickrect);
+            clickrect.addEventListener("click", nodeCallBack(node.id));
+          }
+        );
+        renderer.start();
+      }
+
+      function show_error(error) {
+        console.log("error !");
+        console.log(error);
+        const errorsec = document.querySelector(".errors");
+        const pre = document.createElement("pre");
+        pre.innerText =
+          "something went wrong with loading yaml\n" + error.message;
+        errorsec.appendChild(pre);
+        errorsec.classList.remove("invisible");
+      }
+
+      document.addEventListener("DOMContentLoaded", (e) => {
+        switch (window.location.protocol) {
+          case "http:":
+          case "https:":
+            fetch("polycule.yaml", { cache: "no-store" })
+              .then((data) => data.text())
+              .then((text) => {
+                const obj = jsyaml.load(text);
+                return obj;
+              })
+              .catch(show_error)
+              .then(make_graph);
+            break;
+          case "file:":
+            let json;
+            try {
+              json = jsyaml.load(polycule_yaml);
+            } catch (error) {
+              show_error(error);
+            }
+            make_graph(json);
+            break;
+          default:
+            console.log(
+              "what kind of weird way did you find to open this file"
+            );
+        }
+      });
     </script>
     <style>
       * {
