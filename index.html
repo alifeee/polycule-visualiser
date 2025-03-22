@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <script src="./public/jquery.min.js"></script>
+    <script src="./public/js-yaml.min.js"></script>
     <script src="./springy/springy.js"></script>
     <script src="./springy/springyui.js"></script>
     <script>
@@ -45,9 +46,26 @@
         };
       }
 
-      fetch("polycule.json", { cache: "no-store" })
-        .then((data) => data.json())
+      fetch("polycule.yaml", { cache: "no-store" })
+        .then((data) => data.text())
+        .then((text) => {
+          const obj = jsyaml.load(text);
+          return obj;
+        })
+        .catch((e) => {
+          console.log("yaml did not load");
+          console.log(e);
+          const errorsec = document.querySelector(".errors");
+          const pre = document.createElement("pre");
+          pre.innerText =
+            "something went wrong with loading yaml\n" + e.message;
+          errorsec.appendChild(pre);
+          errorsec.classList.remove("invisible");
+        })
         .then((json) => {
+          // fetch("polycule.json", { cache: "no-store" })
+          //   .then((data) => data.json())
+          //   .then((json) => {
           let graph = new Springy.Graph();
 
           const num_nodes = json["nodes"].length;
@@ -227,6 +245,20 @@
       #svg > #clickrects > rect {
         cursor: pointer;
       }
+
+      .errors {
+        position: absolute;
+        top: 0;
+        color: darkred;
+        background: lightgray;
+        border: 3px dashed red;
+        margin: 1rem;
+        padding: 1rem;
+      }
+      .errors.invisible {
+        display: none;
+      }
+
       section.edit {
         display: flex;
         flex-direction: column;
@@ -262,6 +294,7 @@
       <g id="nodes"></g>
       <g id="clickrects"></g>
     </svg>
+    <section class="errors invisible"></section>
     <section class="edit">
       <button onclick='$("#form").toggle()'>edit...</button>
       <form action="./edit" method="post" id="form" autocomplete="off">

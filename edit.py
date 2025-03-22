@@ -14,8 +14,9 @@ import argparse
 from dataclasses import dataclass
 from typing import List, Tuple
 from urllib.parse import parse_qsl
+import yaml
 
-FILE = "polycule.json"
+FILE = "polycule.yaml"
 DEBUG = True
 LOG_FILE = "edits.log"
 DO_LOGGING = False
@@ -233,7 +234,8 @@ def main(args):
 
     debug(f"reading from file {FILE}")
     with open(FILE, "r", encoding="utf-8") as file:
-        data = json.load(file)
+        # data = json.load(file)
+        data = yaml.load(file, Loader=yaml.SafeLoader)
     debug(f"started with {data}")
 
     # debug objects
@@ -266,7 +268,8 @@ def main(args):
         return
     debug(f"writing to file {FILE}")
     with open(FILE, "w", encoding="utf-8") as file:
-        json.dump(data, file, indent=" ")
+        # json.dump(data, file, indent=" ")
+        yaml.dump(data, file)
 
     print("HTTP/1.1 303 See Other")
     print("Location: /polycule/")

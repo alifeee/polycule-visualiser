@@ -1,0 +1,23 @@
+nodes:
+  - name: This
+  - name: is
+  - name: sourcecode
+  - name: website
+  - name: available
+  - name: an example
+edges:
+  - from: This
+    to: website
+  - from: website
+    to: is
+  - from: an example
+    to: is
+  - from: website
+    to: sourcecode
+    type: dashed
+  - from: sourcecode
+    to: is
+    type: dashed
+  - from: is
+    to: available
+    type: dashed
