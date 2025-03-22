@@ -13,3 +13,6 @@ _data/URIs.json
 # log
 log
 edits.log
+
+# python
+/__pycache__/

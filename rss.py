@@ -3,16 +3,17 @@
 
 from datetime import timezone, datetime
 import os
+import hashlib
 
-FILE = "polycule.json"
+FILE = "polycule.yaml"
 ISO_DATE = "%Y-%m-%dT%H:%M:%S%z"
 
 mod_date = os.path.getmtime(FILE)
 mod_datetime = datetime.fromtimestamp(mod_date, tz=timezone.utc)
 
-with open(FILE, "r", encoding="utf-8") as file:
+with open(FILE, "rb") as file:
     contents = file.read()
-
+md5hash = hashlib.md5(contents).hexdigest()
 
 print("Content-type: application/xml")
 print()
@@ -30,7 +31,7 @@ print(
     <entry>
         <title>polycule update!</title>
         <link href='https://server.alifeee.net/polycule/' />
-        <id>uuid:{hash(contents)}</id>
+        <id>uuid:{md5hash}</id>
         <updated>{mod_datetime.isoformat()}</updated>
         <summary>updated!</summary>
     </entry>
