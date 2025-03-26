@@ -35,6 +35,7 @@ mkdir -p /var/www/
 git clone git@github.com:alifeee/polycule-visualiser /var/www/polycule
 cd /var/www/polycule
 
+cp .env.example .env
 cp polycule.yaml.example polycule.yaml
 # We change the ownership of the built files, so that the www-data user can change them later.
 sudo chown $USER:www-data polycule.yaml

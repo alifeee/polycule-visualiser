@@ -15,8 +15,12 @@ from dataclasses import dataclass
 from typing import List, Tuple
 from urllib.parse import parse_qsl
 import yaml
+from dotenv import load_dotenv
+
+load_dotenv()
 
 FILE = "polycule.yaml"
+HOME_URL = os.environ["HOME_URL"]
 DEBUG = True
 LOG_FILE = "edits.log"
 DO_LOGGING = False
@@ -279,7 +283,7 @@ def main(args):
         return
 
     print("HTTP/1.1 303 See Other")
-    print("Location: /polycule/")
+    print(f"Location: {HOME_URL}")
     print()
     print("you should be redirected to /polycule/")
 

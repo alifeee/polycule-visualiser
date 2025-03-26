@@ -9,6 +9,7 @@ polycule.json
 polycule.yaml
 _data/URIs.json
 .htpasswd
+.env
 
 # log
 log

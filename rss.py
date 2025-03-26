@@ -4,8 +4,12 @@
 from datetime import timezone, datetime
 import os
 import hashlib
+from dotenv import load_dotenv
+
+load_dotenv()
 
 FILE = "polycule.yaml"
+HOME_URL = os.environ["HOME_URL"]
 ISO_DATE = "%Y-%m-%dT%H:%M:%S%z"
 
 mod_date = os.path.getmtime(FILE)
@@ -22,15 +26,15 @@ print(
     f"""<?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>polycule</title>
-    <link href='https://server.alifeee.net/polycule/rss' rel='self' />
+    <link href='https://server.alifeee.net{HOME_URL}rss' rel='self' />
     <updated>{mod_datetime.isoformat()}</updated>
     <author>
         <name>alifeee</name>
     </author>
-    <id>https://server.alifeee.net/polycule/</id>
+    <id>https://server.alifeee.net{HOME_URL}</id>
     <entry>
         <title>polycule update!</title>
-        <link href='https://server.alifeee.net/polycule/' />
+        <link href='https://server.alifeee.net{HOME_URL}' />
         <id>uuid:{md5hash}</id>
         <updated>{mod_datetime.isoformat()}</updated>
         <summary>updated!</summary>
