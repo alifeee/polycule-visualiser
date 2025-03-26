@@ -86,8 +86,8 @@ edges:
         let graph = new Springy.Graph();
 
         const num_nodes = json["nodes"].length;
-        const stroke_width = 10 / num_nodes;
-        const text_size = 40 / num_nodes;
+        const stroke_width = num_nodes > 5 ? 10 / num_nodes : 2;
+        const text_size = num_nodes > 5 ? 40 / num_nodes : 8;
 
         json["nodes"].forEach((n) => {
           graph.addNodes(n.name);
