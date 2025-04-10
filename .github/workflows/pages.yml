@@ -27,7 +27,7 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Rename json file
-        run: cp polycule.json.example polycule.json
+        run: cp polycule.yaml.example polycule.yaml
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
