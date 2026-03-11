@@ -1,3 +1,5 @@
+> [!CAUTION]
+> MOVED! see <https://git.alifeee.net/polycule-visualiser/about/>
 # Polycule Visualiser
 
 A graph visualiser designed to be self-hosted, using [Springy]
